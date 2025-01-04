@@ -6,7 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,6 +24,12 @@ import com.scrollcity.R
 // Main Composable for Filter Activities Screen
 @Composable
 fun FilterActivitiesScreen(navController: NavController) {
+    // Slider states
+    var peopleValue by remember { mutableStateOf(1f) }  // 1..10; if at 10, show "10+"
+    var costValue by remember { mutableStateOf(0f) }    // 0..3; 0=empty, 1=$, 2=$$, 3=$$$+
+    var timeValue by remember { mutableStateOf(12f) }   // 0..23 in 24-hour format
+    var distanceValue by remember { mutableStateOf(1f) } // 1..50; if at 50, show "50+"
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -39,11 +45,78 @@ fun FilterActivitiesScreen(navController: NavController) {
                 // Header Text
                 Text(
                     text = "Select Your Desired Venues",
-                    fontSize = 30.sp, // Changed to align with the style of the main screen
+                    fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.Black,
                     textAlign = TextAlign.Center
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // ---- DRAGGABLE PROGRESS BARS START ----
+                // People Slider
+                Text(
+                    text = "Number of People: ${if (peopleValue >= 10f) "10+" else peopleValue.toInt()}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Slider(
+                    value = peopleValue,
+                    onValueChange = { peopleValue = it },
+                    valueRange = 1f..10f,
+                    steps = 8,  // Steps from 1..10 (there are 9 intervals, so steps=8)
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Cost Slider
+                // 0 = no cost symbol, 1=$, 2=$$, 3=$$$+
+                Text(
+                    text = "Cost: " + when (costValue.toInt()) {
+                        0 -> "Free"
+                        1 -> "$"
+                        2 -> "$$"
+                        else -> "$$$+"
+                    },
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Slider(
+                    value = costValue,
+                    onValueChange = { costValue = it },
+                    valueRange = 0f..3f,
+                    steps = 2, // 3 intervals means 2 steps
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Time Slider (0–23 in 24-hour format)
+                Text(
+                    text = "Preferred Time: ${timeValue.toInt()}:00",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Slider(
+                    value = timeValue,
+                    onValueChange = { timeValue = it },
+                    valueRange = 0f..23f,
+                    steps = 22, // For 23 intervals from 0..23
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Distance Slider
+                Text(
+                    text = "Distance: ${if (distanceValue >= 50f) "50+ km" else "${distanceValue.toInt()} km"}",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Slider(
+                    value = distanceValue,
+                    onValueChange = { distanceValue = it },
+                    valueRange = 1f..50f,
+                    steps = 48,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                // ---- DRAGGABLE PROGRESS BARS END ----
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Include/Exclude Toggle Row
@@ -56,7 +129,7 @@ fun FilterActivitiesScreen(navController: NavController) {
                 ) {
                     Text(
                         text = "Include/Exclude Venues",
-                        fontSize = 18.sp, // Similar font scale as other parts of the app
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color.Black
                     )
@@ -148,7 +221,6 @@ fun getSampleActivities(): List<ActivityItem> {
         ActivityItem("Comedy Club", R.drawable.ic_home)
     )
 }
-
 
 @Preview(showBackground = true)
 @Composable
