@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "ScrollCityApp"
+rootProject.name = "Spotter"
 include(":app")
  
