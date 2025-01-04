@@ -1,0 +1,12 @@
+filter function:
+1. users can set the number of people by clicking on cute person icons that will be a draggable.
+ there's also going to be a special checkbox  when 2 selected for couple
+2. users can filter the expense of the activity from fee to $ to $$$ that is also draggable.
+3. users also can drag the time filter icon, which will be from day to night, and the drag line will change the
+color from oragne to dark blue depending on the hour selected.
+4. users can set the mood/purpose, like eating (food icon), having fun, clubbing, gaming, other.
+
+
+rating functionality is questinable, but could be considered. same for reviews, start rating could be visible directly
+when scrolling, and then people could add comments after opening the details of the venue.
+
