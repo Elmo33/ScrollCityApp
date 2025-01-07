@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.scrollcity"
+    namespace = "com.spotter"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.scrollcity"
+        applicationId = "com.spotter"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -43,6 +43,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation("androidx.compose.material:material-icons-extended:1.5.0")
 
     // Compose BOM (pick a stable version matching your libs.* or specify a version)
     implementation(platform(libs.androidx.compose.bom))

@@ -1,4 +1,4 @@
-package com.scrollcity
+package com.spotter
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.scrollcity.ui.theme
+package com.spotter.ui.theme
 
 import androidx.compose.material3.Typography
 

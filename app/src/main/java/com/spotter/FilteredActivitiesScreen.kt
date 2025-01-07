@@ -1,16 +1,16 @@
-package com.scrollcity.ui
+package com.spotter.ui
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -19,30 +19,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.scrollcity.R
+import com.spotter.R
 
 // Main Composable for Filter Activities Screen
 @Composable
 fun FilterActivitiesScreen(navController: NavController) {
-    // Slider states
-    var peopleValue by remember { mutableStateOf(1f) }  // 1..10; if at 10, show "10+"
-    var costValue by remember { mutableStateOf(0f) }    // 0..3; 0=empty, 1=$, 2=$$, 3=$$$+
-    var timeValue by remember { mutableStateOf(12f) }   // 0..23 in 24-hour format
-    var distanceValue by remember { mutableStateOf(1f) } // 1..50; if at 50, show "50+"
+    var peopleValue by remember { mutableStateOf(1f) }
+    var isPeopleEnabled by remember { mutableStateOf(false) }
+    var costValue by remember { mutableStateOf(0f) }
+    var isCostEnabled by remember { mutableStateOf(false) }
+    var timeValue by remember { mutableStateOf(0f) }
+    var isTimeEnabled by remember { mutableStateOf(false) }
+    var distanceValue by remember { mutableStateOf(1f) }
+    var isDistanceEnabled by remember { mutableStateOf(false) }
+    val timePeriods = listOf("Morning", "Afternoon", "Evening", "Night")
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
+            // Scrollable content
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(16.dp)
+                    .padding(bottom = 90.dp)
+                    .verticalScroll(rememberScrollState())
             ) {
-                // Header Text
                 Text(
                     text = "Select Your Desired Venues",
                     fontSize = 30.sp,
@@ -53,23 +57,22 @@ fun FilterActivitiesScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // ---- DRAGGABLE PROGRESS BARS START ----
                 // People Slider
                 Text(
-                    text = "Number of People: ${if (peopleValue >= 10f) "10+" else peopleValue.toInt()}",
+                    text = "Number of People: ${if (peopleValue >= 5f) "5+" else peopleValue.toInt()}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 )
-                Slider(
+                SliderWithToggle(
                     value = peopleValue,
                     onValueChange = { peopleValue = it },
-                    valueRange = 1f..10f,
-                    steps = 8,  // Steps from 1..10 (there are 9 intervals, so steps=8)
-                    modifier = Modifier.fillMaxWidth()
+                    valueRange = 1f..5f,
+                    steps = 3,
+                    isEnabled = isPeopleEnabled,
+                    onToggle = { isPeopleEnabled = !isPeopleEnabled }
                 )
 
                 // Cost Slider
-                // 0 = no cost symbol, 1=$, 2=$$, 3=$$$+
                 Text(
                     text = "Cost: " + when (costValue.toInt()) {
                         0 -> "Free"
@@ -80,26 +83,28 @@ fun FilterActivitiesScreen(navController: NavController) {
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 )
-                Slider(
+                SliderWithToggle(
                     value = costValue,
                     onValueChange = { costValue = it },
                     valueRange = 0f..3f,
-                    steps = 2, // 3 intervals means 2 steps
-                    modifier = Modifier.fillMaxWidth()
+                    steps = 2,
+                    isEnabled = isCostEnabled,
+                    onToggle = { isCostEnabled = !isCostEnabled }
                 )
 
-                // Time Slider (0–23 in 24-hour format)
+                // Time Slider
                 Text(
-                    text = "Preferred Time: ${timeValue.toInt()}:00",
+                    text = "Preferred Time: ${timePeriods[timeValue.toInt()]}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 )
-                Slider(
+                SliderWithToggle(
                     value = timeValue,
                     onValueChange = { timeValue = it },
-                    valueRange = 0f..23f,
-                    steps = 22, // For 23 intervals from 0..23
-                    modifier = Modifier.fillMaxWidth()
+                    valueRange = 0f..3f,
+                    steps = 3,
+                    isEnabled = isTimeEnabled,
+                    onToggle = { isTimeEnabled = !isTimeEnabled }
                 )
 
                 // Distance Slider
@@ -108,18 +113,17 @@ fun FilterActivitiesScreen(navController: NavController) {
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
                 )
-                Slider(
+                SliderWithToggle(
                     value = distanceValue,
                     onValueChange = { distanceValue = it },
                     valueRange = 1f..50f,
                     steps = 48,
-                    modifier = Modifier.fillMaxWidth()
+                    isEnabled = isDistanceEnabled,
+                    onToggle = { isDistanceEnabled = !isDistanceEnabled }
                 )
-                // ---- DRAGGABLE PROGRESS BARS END ----
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Include/Exclude Toggle Row
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -133,25 +137,76 @@ fun FilterActivitiesScreen(navController: NavController) {
                         fontWeight = FontWeight.Medium,
                         color = Color.Black
                     )
-                    Switch(checked = false, onCheckedChange = { /* TODO: Add logic */ })
+                    Switch(checked = false, onCheckedChange = { /* TODO */ })
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Activities Grid
                 ActivitiesGrid(activities = getSampleActivities())
 
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(32.dp))
             }
 
-            // Bottom Navigation Bar
+            // Fixed "Apply" Button
+            Button(
+                onClick = {
+                    navController.navigate("mainScreen") // Navigate to Main Screen
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 80.dp)
+                    .fillMaxWidth(0.8f),
+                colors = ButtonDefaults.buttonColors(MaterialTheme.colorScheme.primary)
+            ) {
+                Text(
+                    text = "Apply",
+                    fontSize = 20.sp,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             BottomNavigationBar(
                 modifier = Modifier.align(Alignment.BottomCenter),
-                navController = navController // Pass the NavController directly
+                navController = navController
             )
         }
+
+
     }
 }
+
+@Composable
+fun SliderWithToggle(
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    steps: Int,
+    isEnabled: Boolean,
+    onToggle: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Slider(
+            value = value,
+            onValueChange = { if (isEnabled) onValueChange(it) },
+            valueRange = valueRange,
+            steps = steps,
+            enabled = isEnabled,
+            colors = SliderDefaults.colors(
+                thumbColor = if (isEnabled) MaterialTheme.colorScheme.primary else Color.Gray,
+                activeTrackColor = if (isEnabled) MaterialTheme.colorScheme.primary else Color.Gray,
+                inactiveTrackColor = Color.LightGray
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onToggle() } // Toggles enable/disable on click
+        )
+    }
+}
+
 
 // Activities Grid Composable
 @Composable
