@@ -1,8 +1,7 @@
-package com.spotter.ui
+package com.spotter
 
 import android.view.ViewGroup.LayoutParams
 import android.widget.FrameLayout
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -38,9 +37,9 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import androidx.navigation.NavController
-import com.spotter.R
 import com.spotter.sampledata.Venue
 import com.spotter.sampledata.provideSampleVenues
+import com.spotter.ui.BottomNavigationBar
 
 fun createExoPlayers(
     context: android.content.Context,
@@ -62,7 +61,6 @@ fun createExoPlayers(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun MainScrollScreen(navController: NavController) {
     val context = LocalContext.current
@@ -115,7 +113,7 @@ fun MainScrollScreen(navController: NavController) {
 fun Modifier.handleVideoPlayerGestures(exoPlayer: ExoPlayer): Modifier = pointerInput(Unit) {
     awaitPointerEventScope {
         while (true) {
-            val down = awaitFirstDown(requireUnconsumed = false)
+            awaitFirstDown(requireUnconsumed = false)
             val startTime = System.currentTimeMillis()
             var isLongPress = false
 
@@ -143,7 +141,6 @@ fun Modifier.handleVideoPlayerGestures(exoPlayer: ExoPlayer): Modifier = pointer
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FullScreenMediaItem(
     venue: Venue,

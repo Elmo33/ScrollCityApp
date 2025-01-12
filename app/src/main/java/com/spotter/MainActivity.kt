@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import com.spotter.ui.MainScrollScreen
 import androidx.compose.ui.Modifier
 import com.spotter.ui.theme.SpotterTheme
 import androidx.compose.runtime.Composable
@@ -17,7 +16,6 @@ import androidx.navigation.compose.rememberNavController
 import com.spotter.sampledata.provideSampleVenues
 import com.spotter.ui.EventsScreen
 import com.spotter.ui.FilterActivitiesScreen
-import com.spotter.ui.VenueDetailsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
