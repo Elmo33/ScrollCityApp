@@ -44,7 +44,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation("androidx.compose.material:material-icons-extended:1.5.0")
-
+    implementation("androidx.compose.animation:animation:1.5.1")
     // Compose BOM (pick a stable version matching your libs.* or specify a version)
     implementation(platform(libs.androidx.compose.bom))
 

@@ -4,6 +4,7 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.FrameLayout
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
 //import androidx.compose.foundation.layout.FlowRowScopeInstance.align
@@ -285,6 +286,9 @@ fun FullScreenMediaItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0x33000000)) // 80% transparent black background
+                    .clickable {  // Makes the entire section clickable
+                        navController.navigate("venueDetails/${venue.id}")
+                    }
             ) {
                 Column(
                     modifier = Modifier

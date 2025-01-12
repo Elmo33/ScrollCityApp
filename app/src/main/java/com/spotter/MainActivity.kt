@@ -14,8 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.spotter.sampledata.provideSampleVenues
 import com.spotter.ui.EventsScreen
 import com.spotter.ui.FilterActivitiesScreen
+import com.spotter.ui.VenueDetailsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,6 +53,12 @@ fun Spotter() {
                         color = MaterialTheme.colorScheme.onBackground
                     )
                 }
+            }
+            composable("venueDetails/{venueId}") { backStackEntry ->
+                val venueId = backStackEntry.arguments?.getString("venueId")?.toInt() ?: 0
+                val venue = provideSampleVenues().firstOrNull { it.id == venueId }
+                    ?: throw IllegalArgumentException("Venue not found")
+                VenueDetailsScreen(navController = navController, venue = venue)
             }
         }
     }

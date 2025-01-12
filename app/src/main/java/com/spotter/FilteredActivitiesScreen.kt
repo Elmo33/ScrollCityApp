@@ -1,5 +1,7 @@
 package com.spotter.ui
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -178,8 +180,6 @@ fun FilterActivitiesScreen(navController: NavController) {
                 navController = navController
             )
         }
-
-
     }
 }
 
@@ -195,14 +195,14 @@ fun RangeSliderWithIcons(
     valueFormatter: (Float) -> String,
     iconResource: Int? = null
 ) {
-    val density = LocalDensity.current // Access the current screen density for unit conversion
+    val density = LocalDensity.current
     var internalEnabled by remember { mutableStateOf(isEnabled) }
     var sliderRange by remember { mutableStateOf(currentRange) }
     var sliderWidth by remember { mutableStateOf(0f) }
-    var thumbRadiusPx by remember { mutableStateOf(0f) } // Store the thumb radius in pixels
+    var thumbRadiusPx by remember { mutableStateOf(0f) }
 
     LaunchedEffect(Unit) {
-        thumbRadiusPx = with(density) { 10.dp.toPx() } // Convert thumb radius from dp to px
+        thumbRadiusPx = with(density) { 10.dp.toPx() }
     }
 
     Column(
@@ -224,11 +224,33 @@ fun RangeSliderWithIcons(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(100.dp) // Increased height to fit icons below
         ) {
             var startThumbX by remember { mutableStateOf(0f) }
             var endThumbX by remember { mutableStateOf(0f) }
             var iconSizePx by remember { mutableStateOf(0f) }
+
+            // Animatable offset for "dangling" effect
+            val startIconYOffset = remember { Animatable(0f) }
+            val endIconYOffset = remember { Animatable(0f) }
+
+            LaunchedEffect(sliderRange.start) {
+                startIconYOffset.animateTo(
+                    targetValue = (-10..10).random().toFloat(),
+                    animationSpec = spring(
+                        dampingRatio = 0.5f,
+                        stiffness = 200f
+                    )
+                )
+            }
+            LaunchedEffect(sliderRange.endInclusive) {
+                endIconYOffset.animateTo(
+                    targetValue = (-10..10).random().toFloat(),
+                    animationSpec = spring(
+                        dampingRatio = 0.5f,
+                        stiffness = 200f
+                    )
+                )
+            }
 
             RangeSlider(
                 value = sliderRange,
@@ -244,20 +266,15 @@ fun RangeSliderWithIcons(
                 colors = SliderDefaults.colors(
                     thumbColor = Color.Transparent,
                     activeTrackColor = if (internalEnabled) MaterialTheme.colorScheme.primary else Color.Gray,
-                    inactiveTrackColor = Color.LightGray
+                    inactiveTrackColor = Color.LightGray,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .onGloballyPositioned { coordinates ->
-                        sliderWidth = coordinates.size.width.toFloat() // Full slider width
-                        val trackWidth =
-                            sliderWidth - 2 * thumbRadiusPx // Calculate the usable track width
-
-                        // Compute thumb positions within the track
-                        startThumbX =
-                            thumbRadiusPx + ((sliderRange.start - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
-                        endThumbX =
-                            thumbRadiusPx + ((sliderRange.endInclusive - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
+                        sliderWidth = coordinates.size.width.toFloat()
+                        val trackWidth = sliderWidth - 2 * thumbRadiusPx
+                        startThumbX = thumbRadiusPx + ((sliderRange.start - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
+                        endThumbX = thumbRadiusPx + ((sliderRange.endInclusive - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
                     }
             )
 
@@ -267,10 +284,7 @@ fun RangeSliderWithIcons(
                     contentDescription = null,
                     modifier = Modifier
                         .size(32.dp)
-                        .onGloballyPositioned { coordinates ->
-                            iconSizePx = coordinates.size.width.toFloat() // Icon width in pixels
-                        }
-                        .offset { IntOffset((startThumbX - iconSizePx / 2).toInt(), 40) },
+                        .offset { IntOffset((startThumbX - iconSizePx / 2).toInt()- 55, (startIconYOffset.value).toInt() + 35) },
                     tint = if (internalEnabled) MaterialTheme.colorScheme.primary else Color.Gray
                 )
                 Icon(
@@ -278,13 +292,14 @@ fun RangeSliderWithIcons(
                     contentDescription = null,
                     modifier = Modifier
                         .size(32.dp)
-                        .offset { IntOffset((endThumbX - iconSizePx / 2).toInt(), 40) },
+                        .offset { IntOffset((endThumbX - iconSizePx / 2).toInt() - 55, (endIconYOffset.value).toInt() + 35)},
                     tint = if (internalEnabled) MaterialTheme.colorScheme.primary else Color.Gray
                 )
             }
         }
     }
 }
+
 
 
 // Activities Grid Composable
