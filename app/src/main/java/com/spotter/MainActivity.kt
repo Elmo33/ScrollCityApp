@@ -44,13 +44,7 @@ fun Spotter() {
             }
             // Profile screen placeholder
             composable("profileScreen") {
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Text(
-                        text = "Profile Screen",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
+                UserProfileScreen(navController) // Call the UserProfileScreen composable
             }
             composable("venueDetails/{venueId}") { backStackEntry ->
                 val venueId = backStackEntry.arguments?.getString("venueId")?.toInt() ?: 0

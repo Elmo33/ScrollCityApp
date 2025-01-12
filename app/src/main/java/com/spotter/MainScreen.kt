@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
 //import androidx.compose.foundation.layout.FlowRowScopeInstance.align
+//import androidx.compose.foundation.layout.FlowRowScopeInstance.align
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -25,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
@@ -168,11 +171,31 @@ fun FullScreenMediaItem(
         }
     }
 
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
+        IconButton(
+            onClick = {
+                navController.navigate(
+                    "filterActivities"
+                )
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .zIndex(1f)
+                .padding(15.dp, top = 30.dp)
+//                .padding( = R.dimen.right_padding.dp, vertical = 16.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_tune),
+                contentDescription = "Open Filters",
+                modifier = Modifier.size(40.dp),
+                tint = Color.White,
+            )
+        }
         HorizontalPager(
             state = horizontalPagerState,
             modifier = Modifier.fillMaxSize()
@@ -209,7 +232,7 @@ fun FullScreenMediaItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.TopCenter)
-                .padding(top = 30.dp),
+                .padding(top = 40.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             repeat(venue.contentResIds.size) { index ->
@@ -244,42 +267,21 @@ fun FullScreenMediaItem(
                 Column(
 
                 ) {
-                    IconButton(
-                        onClick = {
-                            navController.navigate("filterActivities")
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Tune,
-                            contentDescription = "Open Filters",
-                            modifier = Modifier.size(40.dp),
-                            tint = Color.White
-                        )
-                    }
-                    IconButton(
-                        onClick = { },
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_heart),
-                            contentDescription = "label",
-                            modifier = Modifier.size(40.dp),
-                            tint = Color.White
-                        )
-                    }
-                    IconButton(
-                        onClick = { },
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_share),
-                            contentDescription = "label",
-                            modifier = Modifier.size(40.dp),
-                            tint = Color.White
-                        )
-                    }
+
+                    ActionIconButton(
+                        icon = painterResource(id = R.drawable.ic_heart),
+                        contentDescription = "Add to Favorites",
+                        onClick = { /* Add to favorites */ }
+                    )
+                    ActionIconButton(
+                        icon = painterResource(id = R.drawable.ic_share),
+                        contentDescription = "Share",
+                        onClick = { /* Share the venue */ }
+                    )
                 }
 
             }
-            Box (
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0x33000000)) // 80% transparent black background
@@ -323,6 +325,22 @@ fun FullScreenMediaItem(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ActionIconButton(
+    icon: Painter,
+    contentDescription: String,
+    onClick: () -> Unit
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painter = icon,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(40.dp),
+            tint = Color.White
+        )
     }
 }
 

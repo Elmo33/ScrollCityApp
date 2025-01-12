@@ -40,7 +40,7 @@ fun provideSampleVenues(): List<Venue> {
             costIndicator = "$$",
             contentResIds = listOf(
                 R.raw.testvid1, // Video showcasing the race track
-                R.drawable.image1, // Image of the karts
+                R.drawable.img, // Image of the karts
                 R.drawable.sample_image1  // Aerial shot of the venue
             ),
             amenities = listOf("Free Parking", "On-site Cafe", "Beginner Friendly"),
