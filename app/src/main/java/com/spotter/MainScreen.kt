@@ -95,7 +95,7 @@ fun MainScrollScreen(navController: NavController) {
                         venue = venues[page],
                         exoPlayer = currentPlayer,
                         isActive = isCurrentPage,
-                        navController= navController
+                        navController = navController
                     )
                 }
             }
@@ -233,15 +233,14 @@ fun FullScreenMediaItem(
         // Venue details (name, distance, description)
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(15.dp),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Bottom
         ) {
-//            Spacer(modifier = Modifier.weight(1f)) // Pushes the inner content to the bottom
-
             // Bottom-right aligned content
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 20.dp),
                 horizontalArrangement = Arrangement.End
             ) {
                 Column(
@@ -253,7 +252,7 @@ fun FullScreenMediaItem(
                         },
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Tune, // Material icon that looks like sliders
+                            imageVector = Icons.Filled.Tune,
                             contentDescription = "Open Filters",
                             modifier = Modifier.size(40.dp),
                             tint = Color.White
@@ -282,28 +281,45 @@ fun FullScreenMediaItem(
                 }
 
             }
-            Column(
+            Box (
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 110.dp)
+                    .background(Color(0x33000000)) // 80% transparent black background
             ) {
-                Text(
-                    text = venue.name,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 34.sp,
-                    color = Color.White
-                )
-                Text(
-                    text = venue.distance,
-                    fontSize = 24.sp,
-                    color = Color.Gray
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = venue.description,
-                    fontSize = 24.sp,
-                    color = Color.White
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .padding(bottom = 110.dp)
+                ) {
+                    Text(
+                        text = venue.name,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 34.sp,
+                        color = Color.White
+                    )
+                    Row(
+//                    modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = venue.distance,
+                            fontSize = 24.sp,
+                            color = Color.Gray
+                        )
+                        Text(
+                            text = venue.costIndicator,
+                            fontSize = 24.sp,
+                            color = Color.Green
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = venue.description,
+                        fontSize = 24.sp,
+                        color = Color.White
+                    )
+                }
             }
         }
     }

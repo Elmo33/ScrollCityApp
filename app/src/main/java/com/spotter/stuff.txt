@@ -37,14 +37,14 @@ description:
 
 
 
-Scroll & Go is a niche social media platform designed to help users discover local entertainment
-spots—like bars, clubs, game rooms, and go-kart tracks—through short, engaging videos (30 to 60 seconds).
+Spotter is a niche social media platform designed to help users discover local entertainment
+spots—like bars, clubs, game rooms, and go-kart tracks through short, engaging videos (30 to 60 seconds).
 Businesses upload these clips, showcasing their venue or activity, and users scroll through them in a TikTok-style
 feed. By leveraging filters, tags (e.g., #travel, #tbilisi), and an algorithmic recommendation system,
-Scroll & Go aims to surface hidden gems that people might not otherwise find on larger platforms. The core
+Spotter aims to surface hidden gems that people might not otherwise find on larger platforms. The core
 selling point is easing the discovery process for users who don’t even know what to search for, letting
 them “scroll to discover” rather than actively typing in keywords. While critics argue that major
-social media networks already serve similar content, Scroll & Go’s focus on niche, local experiences
+social media networks already serve similar content, Spotter’s focus on niche, local experiences
 sets it apart, albeit with the challenge of needing strong marketing and creative advertising to build
 an initial user base.
 

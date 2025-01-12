@@ -2,6 +2,8 @@ package com.spotter.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,10 +13,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -24,15 +33,23 @@ import com.spotter.R
 // Main Composable for Filter Activities Screen
 @Composable
 fun FilterActivitiesScreen(navController: NavController) {
-    var peopleValue by remember { mutableStateOf(1f) }
+    var peopleRange by remember { mutableStateOf(1f..5f) }
     var isPeopleEnabled by remember { mutableStateOf(false) }
-    var costValue by remember { mutableStateOf(0f) }
+
+    // Default: Cost range from "Free" to "$$$+"
+    var costRange by remember { mutableStateOf(0f..3f) }
     var isCostEnabled by remember { mutableStateOf(false) }
-    var timeValue by remember { mutableStateOf(0f) }
+
+    // Default: Time range from "Morning" to "Night" (full time range)
+    var timeRange by remember { mutableStateOf(0f..3f) }
     var isTimeEnabled by remember { mutableStateOf(false) }
-    var distanceValue by remember { mutableStateOf(1f) }
+
+    // Default: Distance range from 1 km to 10 km (custom default for distance)
+    var distanceRange by remember { mutableStateOf(1f..10f) }
     var isDistanceEnabled by remember { mutableStateOf(false) }
+
     val timePeriods = listOf("Morning", "Afternoon", "Evening", "Night")
+
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -58,69 +75,60 @@ fun FilterActivitiesScreen(navController: NavController) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // People Slider
-                Text(
-                    text = "Number of People: ${if (peopleValue >= 5f) "5+" else peopleValue.toInt()}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                SliderWithToggle(
-                    value = peopleValue,
-                    onValueChange = { peopleValue = it },
+                RangeSliderWithIcons(
                     valueRange = 1f..5f,
+                    currentRange = peopleRange,
+                    onRangeChange = { peopleRange = it },
                     steps = 3,
                     isEnabled = isPeopleEnabled,
-                    onToggle = { isPeopleEnabled = !isPeopleEnabled }
+                    onToggle = { isPeopleEnabled = !isPeopleEnabled },
+                    labelPrefix = "Number of People:",
+                    valueFormatter = { value -> value.toInt().toString() },
+                    iconResource = R.drawable.single // Custom person icon for thumbs
                 )
+
 
                 // Cost Slider
-                Text(
-                    text = "Cost: " + when (costValue.toInt()) {
-                        0 -> "Free"
-                        1 -> "$"
-                        2 -> "$$"
-                        else -> "$$$+"
-                    },
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                SliderWithToggle(
-                    value = costValue,
-                    onValueChange = { costValue = it },
+                val costLabels = listOf("Free", "$", "$$", "$$$")
+                RangeSliderWithIcons(
                     valueRange = 0f..3f,
+                    currentRange = costRange,
+                    onRangeChange = { costRange = it },
                     steps = 2,
                     isEnabled = isCostEnabled,
-                    onToggle = { isCostEnabled = !isCostEnabled }
+                    onToggle = { isCostEnabled = !isCostEnabled },
+                    labelPrefix = "Cost:",
+                    valueFormatter = { value -> costLabels[value.toInt()] },
+                    iconResource = R.drawable.dollar
                 )
+
 
                 // Time Slider
-                Text(
-                    text = "Preferred Time: ${timePeriods[timeValue.toInt()]}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                SliderWithToggle(
-                    value = timeValue,
-                    onValueChange = { timeValue = it },
+                RangeSliderWithIcons(
                     valueRange = 0f..3f,
-                    steps = 3,
+                    currentRange = timeRange,
+                    onRangeChange = { timeRange = it },
+                    steps = timePeriods.size - 2,
                     isEnabled = isTimeEnabled,
-                    onToggle = { isTimeEnabled = !isTimeEnabled }
+                    onToggle = { isTimeEnabled = !isTimeEnabled },
+                    labelPrefix = "Preferred Time:",
+                    valueFormatter = { value -> timePeriods[value.toInt()] }
                 )
 
+
                 // Distance Slider
-                Text(
-                    text = "Distance: ${if (distanceValue >= 50f) "50+ km" else "${distanceValue.toInt()} km"}",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                SliderWithToggle(
-                    value = distanceValue,
-                    onValueChange = { distanceValue = it },
+                RangeSliderWithIcons(
                     valueRange = 1f..50f,
+                    currentRange = distanceRange,
+                    onRangeChange = { distanceRange = it },
                     steps = 48,
                     isEnabled = isDistanceEnabled,
-                    onToggle = { isDistanceEnabled = !isDistanceEnabled }
+                    onToggle = { isDistanceEnabled = !isDistanceEnabled },
+                    labelPrefix = "Distance:",
+                    valueFormatter = { value -> if (value >= 50f) "50+ km" else "${value.toInt()} km" }
                 )
+
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -176,34 +184,105 @@ fun FilterActivitiesScreen(navController: NavController) {
 }
 
 @Composable
-fun SliderWithToggle(
-    value: Float,
-    onValueChange: (Float) -> Unit,
+fun RangeSliderWithIcons(
     valueRange: ClosedFloatingPointRange<Float>,
+    currentRange: ClosedFloatingPointRange<Float>,
+    onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
     steps: Int,
     isEnabled: Boolean,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
+    labelPrefix: String,
+    valueFormatter: (Float) -> String,
+    iconResource: Int? = null
 ) {
+    val density = LocalDensity.current // Access the current screen density for unit conversion
+    var internalEnabled by remember { mutableStateOf(isEnabled) }
+    var sliderRange by remember { mutableStateOf(currentRange) }
+    var sliderWidth by remember { mutableStateOf(0f) }
+    var thumbRadiusPx by remember { mutableStateOf(0f) } // Store the thumb radius in pixels
+
+    LaunchedEffect(Unit) {
+        thumbRadiusPx = with(density) { 10.dp.toPx() } // Convert thumb radius from dp to px
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(12.dp)
+            .clickable { internalEnabled = !internalEnabled; onToggle() }
     ) {
-        Slider(
-            value = value,
-            onValueChange = { if (isEnabled) onValueChange(it) },
-            valueRange = valueRange,
-            steps = steps,
-            enabled = isEnabled,
-            colors = SliderDefaults.colors(
-                thumbColor = if (isEnabled) MaterialTheme.colorScheme.primary else Color.Gray,
-                activeTrackColor = if (isEnabled) MaterialTheme.colorScheme.primary else Color.Gray,
-                inactiveTrackColor = Color.LightGray
-            ),
+        Text(
+            text = if (sliderRange.start == sliderRange.endInclusive) {
+                "$labelPrefix ${valueFormatter(sliderRange.start)}"
+            } else {
+                "$labelPrefix ${valueFormatter(sliderRange.start)} - ${valueFormatter(sliderRange.endInclusive)}"
+            },
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium
+        )
+
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onToggle() } // Toggles enable/disable on click
-        )
+                .height(100.dp) // Increased height to fit icons below
+        ) {
+            var startThumbX by remember { mutableStateOf(0f) }
+            var endThumbX by remember { mutableStateOf(0f) }
+            var iconSizePx by remember { mutableStateOf(0f) }
+
+            RangeSlider(
+                value = sliderRange,
+                onValueChange = {
+                    if (internalEnabled) {
+                        sliderRange = it
+                        onRangeChange(it)
+                    }
+                },
+                valueRange = valueRange,
+                steps = steps,
+                enabled = internalEnabled,
+                colors = SliderDefaults.colors(
+                    thumbColor = Color.Transparent,
+                    activeTrackColor = if (internalEnabled) MaterialTheme.colorScheme.primary else Color.Gray,
+                    inactiveTrackColor = Color.LightGray
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onGloballyPositioned { coordinates ->
+                        sliderWidth = coordinates.size.width.toFloat() // Full slider width
+                        val trackWidth =
+                            sliderWidth - 2 * thumbRadiusPx // Calculate the usable track width
+
+                        // Compute thumb positions within the track
+                        startThumbX =
+                            thumbRadiusPx + ((sliderRange.start - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
+                        endThumbX =
+                            thumbRadiusPx + ((sliderRange.endInclusive - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
+                    }
+            )
+
+            if (iconResource != null) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = iconResource),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .onGloballyPositioned { coordinates ->
+                            iconSizePx = coordinates.size.width.toFloat() // Icon width in pixels
+                        }
+                        .offset { IntOffset((startThumbX - iconSizePx / 2).toInt(), 40) },
+                    tint = if (internalEnabled) MaterialTheme.colorScheme.primary else Color.Gray
+                )
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = iconResource),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .offset { IntOffset((endThumbX - iconSizePx / 2).toInt(), 40) },
+                    tint = if (internalEnabled) MaterialTheme.colorScheme.primary else Color.Gray
+                )
+            }
+        }
     }
 }
 

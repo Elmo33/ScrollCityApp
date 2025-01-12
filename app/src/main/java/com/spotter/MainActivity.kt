@@ -18,7 +18,6 @@ import com.spotter.ui.EventsScreen
 import com.spotter.ui.FilterActivitiesScreen
 
 class MainActivity : ComponentActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
