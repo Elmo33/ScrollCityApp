@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.spotter.R
+import com.spotter.getSampleActivities
 
 // Main Composable for Filter Activities Screen
 @Composable
@@ -341,35 +342,6 @@ fun ActivitiesGrid(activities: List<ActivityItem>) {
 // Sample Data Class and Function for Activities
 data class ActivityItem(val name: String, val iconResId: Int)
 
-fun getSampleActivities(): List<ActivityItem> {
-    return listOf(
-        ActivityItem("Carting", R.drawable.ic_home),
-        ActivityItem("Clubbing", R.drawable.ic_home),
-        ActivityItem("Arcade", R.drawable.ic_home),
-        ActivityItem("Go-Kart", R.drawable.ic_home),
-        ActivityItem("Cafe", R.drawable.ic_home),
-        ActivityItem("Music", R.drawable.ic_home),
-        ActivityItem("Cinema", R.drawable.ic_home),
-        ActivityItem("Bowling", R.drawable.ic_home),
-        ActivityItem("Bar", R.drawable.ic_home),
-        ActivityItem("Park", R.drawable.ic_home),
-        ActivityItem("Gallery", R.drawable.ic_home),
-        ActivityItem("Museum", R.drawable.ic_home),
-        ActivityItem("Restaurant", R.drawable.ic_home),
-        ActivityItem("Adventure", R.drawable.ic_home),
-        ActivityItem("Beach", R.drawable.ic_home),
-        ActivityItem("Hiking", R.drawable.ic_home),
-        ActivityItem("Pool", R.drawable.ic_home),
-        ActivityItem("Gym", R.drawable.ic_home),
-        ActivityItem("Escape Room", R.drawable.ic_home),
-        ActivityItem("Concert", R.drawable.ic_home),
-        ActivityItem("Live Show", R.drawable.ic_home),
-        ActivityItem("Paintball", R.drawable.ic_home),
-        ActivityItem("Festival", R.drawable.ic_home),
-        ActivityItem("Theater", R.drawable.ic_home),
-        ActivityItem("Comedy Club", R.drawable.ic_home)
-    )
-}
 
 @Preview(showBackground = true)
 @Composable

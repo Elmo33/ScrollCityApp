@@ -30,6 +30,12 @@ MAIN SCREEN:
 
 DETAILS SCREEN:
 
+details screen should include following info about the venue:
+1. Name
+2. Distance
+3. Price range
+4. Availability times - weekdays - hours
+
 USER PROFILE SCREEN:
 
 NAVIGATION MENU:

@@ -1,37 +1,32 @@
 package com.spotter.ui.theme
 
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.sp
+import com.spotter.R
 
-// Define your custom color schemes
-private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFFFF9800), // Change to your desired primary color
-    onPrimary = Color.White,
-    secondary = Color(0xFF03DAC5),
-    background = Color(0xFFF2F2F2),
-    surface = Color.White,
-    onSurface = Color.Black
-)
 
 private val DarkColorScheme = darkColorScheme(
     primary = Color(0xFFFF9800),
     onPrimary = Color.White,
     secondary = Color(0xFF03DAC5),
-    background = Color.Black,
+    background = Color(0xFF05080D),
     surface = Color(0xFF121212),
-    onSurface = Color.White
+    onSurface = Color.White,
+    onBackground = Color(0xFFFFFFFF)
 )
 
 // Main theme composable
 @Composable
 fun SpotterTheme(
-    darkTheme: Boolean = false, // Toggle between dark and light themes
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
+    val colorScheme = DarkColorScheme
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,

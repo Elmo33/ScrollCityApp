@@ -25,7 +25,7 @@ fun BottomNavigationBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(80.dp)  // Fixed height for the bottom navigation bar
+            .height(56.dp)  // Fixed height for the bottom navigation bar
     ) {
         // Gradient background
         Box(
@@ -40,7 +40,7 @@ fun BottomNavigationBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)  // Align to the bottom
-                .padding(bottom = 10.dp),  // Fixed padding
+                .padding(5.dp),  // Fixed padding
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -53,9 +53,8 @@ fun BottomNavigationBar(
             ) {
                 NavigationButton(
                     iconResId = R.drawable.binoculars,
-                    label = "",
+                    label = "Discover",
                     onClick = { navController.navigate("mainScreen") },
-                    iconSize = 50,  // Custom icon size for "Discover"
                 )
             }
             NavigationButton(
@@ -72,7 +71,7 @@ fun NavigationButton(
     iconResId: Int,
     label: String,
     onClick: () -> Unit,
-    iconSize: Int = 28,  // Default icon size (can be overridden)
+    iconSize: Int = 24,  // Default icon size (can be overridden)
     padding: Int = 0
 ) {
     Column(
@@ -92,7 +91,7 @@ fun NavigationButton(
         }
         Text(
             text = label,
-            fontSize = 12.sp,
+            fontSize = 10.sp,
             color = Color.White
         )
     }

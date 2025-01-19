@@ -14,7 +14,8 @@ data class Venue(
     val costIndicator: String,
     val contentResIds: List<Int>, // List of resource IDs for videos/images
     val amenities: List<String> = listOf(), // Optional amenities list
-    val reviews: List<Review> = listOf() // Optional user reviews
+    val reviews: List<Review> = listOf(), // Optional user reviews
+    val address: String // New property for venue address
 )
 
 /**
@@ -47,7 +48,8 @@ fun provideSampleVenues(): List<Venue> {
             reviews = listOf(
                 Review("Alex", "Loved the fast karts and friendly staff!", 5),
                 Review("Mia", "A bit pricey, but the track is excellent!", 4)
-            )
+            ),
+            address = "123 Race Track Lane, Speedyville"
         ),
         Venue(
             id = 2,
@@ -58,14 +60,14 @@ fun provideSampleVenues(): List<Venue> {
             costIndicator = "Free",
             contentResIds = listOf(
                 R.raw.testvid2, // Video of someone on the zip line
-                R.drawable.adventure_image1, // A beautiful image of the trail
-//                R.drawable.adventure_image2  // Action shot of the climbing wall
+                R.drawable.adventure_image1 // A beautiful image of the trail
             ),
             amenities = listOf("Pet-Friendly", "Picnic Areas", "Restrooms"),
             reviews = listOf(
                 Review("Chris", "Great place for the family!", 5),
                 Review("Sam", "Some activities were closed, but still fun.", 3)
-            )
+            ),
+            address = "456 Adventure Road, Thrilltown"
         ),
         Venue(
             id = 3,
@@ -83,7 +85,8 @@ fun provideSampleVenues(): List<Venue> {
             reviews = listOf(
                 Review("Emily", "Fantastic music and ambiance!", 5),
                 Review("Liam", "Drinks were expensive but worth it.", 4)
-            )
+            ),
+            address = "789 Jazz Street, Melodyville"
         ),
         Venue(
             id = 4,
@@ -94,14 +97,14 @@ fun provideSampleVenues(): List<Venue> {
             costIndicator = "$",
             contentResIds = listOf(
                 R.raw.testvid4,  // Video showing the sunset over the cafe
-                R.drawable.sunset_image1, // Outdoor seating photo
-//                R.drawable.sunset_image2  // Artistic shot of the signature coffee
+                R.drawable.sunset_image1 // Outdoor seating photo
             ),
             amenities = listOf("Wi-Fi", "Outdoor Seating", "Vegetarian Options"),
             reviews = listOf(
                 Review("Noah", "Great coffee and view!", 5),
                 Review("Sophia", "Service was slow, but the sunset made up for it.", 3)
-            )
+            ),
+            address = "321 Sunset Blvd, Viewtown"
         )
     )
 }
