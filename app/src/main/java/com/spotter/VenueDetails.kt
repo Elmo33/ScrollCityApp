@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,22 +39,29 @@ import androidx.navigation.NavController
 import com.spotter.sampledata.Venue
 import com.spotter.ui.BottomNavigationBar
 
+
 @androidx.annotation.OptIn(UnstableApi::class)
 @Composable
 fun VenueDetailsScreen(navController: NavController, venue: Venue) {
     val context = LocalContext.current
-    var isFullScreen by remember { mutableStateOf(false) }
-    var selectedMediaIndex by remember { mutableStateOf(0) }
 
-    // Media carousel ExoPlayer for video resources
+
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
+            // Add the media items for the venue
+            venue.contentResIds.forEach { resId ->
+                addMediaItem(MediaItem.fromUri("android.resource://${context.packageName}/$resId"))
+            }
             prepare()
         }
     }
-    val horizontalPagerState =
-        rememberPagerState(initialPage = 0, pageCount = { venue.contentResIds.size })
 
+    // Release the ExoPlayer when leaving the screen
+    DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
+        }
+    }
     // Stacking content and bottom navigation
     Box(
         modifier = Modifier
@@ -64,11 +72,9 @@ fun VenueDetailsScreen(navController: NavController, venue: Venue) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
         }
 
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 90.dp)
                 .verticalScroll(rememberScrollState())// To avoid overlapping with the navbar
         ) {
             // Media carousel (smaller size)

@@ -34,6 +34,7 @@ fun HorizontalMediaScroll(
     exoPlayer: ExoPlayer, // ExoPlayer instance
     context: Context, // Context for checking video resources
     modifier: Modifier = Modifier, // Modifier for the layout
+    isDetailsPage: Boolean = false,
     indicatorColor: Color = Color.White, // Active indicator color
     inactiveIndicatorColor: Color = Color.Gray, // Inactive indicator color
     spacing: Dp = 12.dp, // Spacing between indicators
@@ -44,14 +45,14 @@ fun HorizontalMediaScroll(
 ) {
     val horizontalPagerState =rememberPagerState(initialPage = 0, pageCount = { venue.contentResIds.size })
 
-    LaunchedEffect(isActive) {
+    LaunchedEffect(isActive, horizontalPagerState.currentPage) {
         exoPlayer.playWhenReady = isActive && isVideoResource(
             context,
-            venue.contentResIds[horizontalPagerState.currentPage]
+            contentResIds[horizontalPagerState.currentPage]
         )
         if (isActive && isVideoResource(
                 context,
-                venue.contentResIds[horizontalPagerState.currentPage]
+                contentResIds[horizontalPagerState.currentPage]
             )
         ) {
             exoPlayer.play()
@@ -59,35 +60,41 @@ fun HorizontalMediaScroll(
             exoPlayer.pause()
         }
     }
-
     HorizontalPager(
         state = horizontalPagerState,
         modifier = Modifier.fillMaxWidth()
     ) { mediaIndex ->
         val mediaResId = contentResIds[mediaIndex]
-        if (isVideoResource(context, mediaResId)) {
-            // Video Player View
-            AndroidView(
-                modifier = Modifier.fillMaxWidth(),
-                factory = { ctx ->
-                    PlayerView(ctx).apply {
-                        layoutParams = FrameLayout.LayoutParams(
-                            LayoutParams.MATCH_PARENT,
-                            LayoutParams.MATCH_PARENT
-                        )
-                        setBackgroundColor(android.graphics.Color.BLACK)
-                        player = exoPlayer
-                        useController = false
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+//                .aspectRatio(if (isDetailsPage) 16 / 7f else 16 / 9f) // Adjust aspect ratio for details page
+                .background(Color.Black) // Prevent transparency
+        ) {
+            if (isVideoResource(context, mediaResId)) {
+                // Video Player View
+                AndroidView(
+                    modifier = Modifier.fillMaxWidth(),
+                    factory = { ctx ->
+                        PlayerView(ctx).apply {
+                            layoutParams = FrameLayout.LayoutParams(
+                                LayoutParams.MATCH_PARENT,
+                                LayoutParams.MATCH_PARENT
+                            )
+                            setBackgroundColor(android.graphics.Color.BLACK)
+                            player = exoPlayer
+                            useController = false
+                        }
                     }
-                }
-            )
-        } else {
-            // Image View
-            androidx.compose.foundation.Image(
-                painter = painterResource(id = mediaResId),
-                contentDescription = "Image content",
-                modifier = Modifier.fillMaxWidth()
-            )
+                )
+            } else {
+                // Image View
+                androidx.compose.foundation.Image(
+                    painter = painterResource(id = mediaResId),
+                    contentDescription = "Image content",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
     }
     Box(modifier = modifier.fillMaxWidth()) {
