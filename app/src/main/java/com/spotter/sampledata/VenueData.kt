@@ -15,7 +15,8 @@ data class Venue(
     val contentResIds: List<Int>, // List of resource IDs for videos/images
     val amenities: List<String> = listOf(), // Optional amenities list
     val reviews: List<Review> = listOf(), // Optional user reviews
-    val address: String // New property for venue address
+    val address: String, // New property for venue address
+    val phoneNum: String // New property for venue phone number
 )
 
 /**
@@ -49,7 +50,9 @@ fun provideSampleVenues(): List<Venue> {
                 Review("Alex", "Loved the fast karts and friendly staff!", 5),
                 Review("Mia", "A bit pricey, but the track is excellent!", 4)
             ),
-            address = "123 Race Track Lane, Speedyville"
+            address = "123 Race Track Lane, Speedyville",
+            phoneNum = "+995557557775",
+
         ),
         Venue(
             id = 2,
@@ -67,7 +70,8 @@ fun provideSampleVenues(): List<Venue> {
                 Review("Chris", "Great place for the family!", 5),
                 Review("Sam", "Some activities were closed, but still fun.", 3)
             ),
-            address = "456 Adventure Road, Thrilltown"
+            address = "456 Adventure Road, Thrilltown",
+            phoneNum = "+995557557775",
         ),
         Venue(
             id = 3,
@@ -86,7 +90,8 @@ fun provideSampleVenues(): List<Venue> {
                 Review("Emily", "Fantastic music and ambiance!", 5),
                 Review("Liam", "Drinks were expensive but worth it.", 4)
             ),
-            address = "789 Jazz Street, Melodyville"
+            address = "789 Jazz Street, Melodyville",
+            phoneNum = "+995557557775",
         ),
         Venue(
             id = 4,
@@ -104,7 +109,8 @@ fun provideSampleVenues(): List<Venue> {
                 Review("Noah", "Great coffee and view!", 5),
                 Review("Sophia", "Service was slow, but the sunset made up for it.", 3)
             ),
-            address = "321 Sunset Blvd, Viewtown"
+            address = "321 Sunset Blvd, Viewtown",
+            phoneNum = "+995557557775",
         )
     )
 }

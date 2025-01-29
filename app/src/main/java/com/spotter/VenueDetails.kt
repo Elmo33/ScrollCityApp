@@ -24,12 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
 import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -68,10 +70,19 @@ fun VenueDetailsScreen(navController: NavController, venue: Venue) {
             .fillMaxSize()
             .background(color = MaterialTheme.colorScheme.background)
     ) {
-        IconButton(onClick = { navController.popBackStack() }) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+        IconButton(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier
+                .padding(top = context.resources.getDimension(R.dimen.top_padding).dp)
+                .zIndex(1f)// Custom size for icon button
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.back_ic),
+                contentDescription = "",
+                tint = Color.White,
+                modifier = Modifier.size(context.resources.getDimension(R.dimen.icon_buttons).dp) // Actual icon size
+            )
         }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,7 +96,8 @@ fun VenueDetailsScreen(navController: NavController, venue: Venue) {
                     context = context,
                     isActive = true,
                     venue = venue,
-                    modifier = Modifier.padding(top = 40.dp)
+                    modifier = Modifier.padding(top = 40.dp),
+                    isDetailsPage = true
                 )// Bounded height
             }
 
@@ -126,9 +138,13 @@ fun VenueDetailsScreen(navController: NavController, venue: Venue) {
                 Text(
                     text = venue.description,
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(bottom = 16.dp),
 
                     )
+                Text(
+                    text = venue.phoneNum,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
                 HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -166,6 +182,18 @@ fun VenueDetailsScreen(navController: NavController, venue: Venue) {
                     ) {
                         Text(text = "Leave a Review")
                     }
+
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.right_arrow_ic),
+                            contentDescription = "",
+                            tint = Color.White,
+                            modifier = Modifier.size(context.resources.getDimension(R.dimen.icon_buttons).dp) // Actual icon size
+                        )
+                    }
                 }
             }
             Column(
@@ -193,32 +221,32 @@ fun VenueDetailsScreen(navController: NavController, venue: Venue) {
                     }
                 }
 
-                Text(
-                    text = "User Reviews:",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-                if (venue.reviews.isNotEmpty()) {
-                    venue.reviews.forEach { review ->
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp),
-                            shape = RoundedCornerShape(8.dp),
-                        ) {
-                            Column(modifier = Modifier.padding(8.dp)) {
-                                Text(text = review.username, fontWeight = FontWeight.Bold)
-                                Text(text = "\"${review.comment}\"", textAlign = TextAlign.Justify)
-                                Text(text = "Rating: ${review.rating}★", color = Color.Gray)
-                            }
-                        }
-                    }
-                } else {
-                    Text(text = "No reviews yet!", color = Color.Gray)
-                }
+//                Text(
+//                    text = "User Reviews:",
+//                    fontSize = 20.sp,
+//                    fontWeight = FontWeight.Bold,
+//                    modifier = Modifier.padding(vertical = 8.dp)
+//                )
+//                if (venue.reviews.isNotEmpty()) {
+//                    venue.reviews.forEach { review ->
+//                        Card(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(vertical = 4.dp),
+//                            shape = RoundedCornerShape(8.dp),
+//                        ) {
+//                            Column(modifier = Modifier.padding(8.dp)) {
+//                                Text(text = review.username, fontWeight = FontWeight.Bold)
+//                                Text(text = "\"${review.comment}\"", textAlign = TextAlign.Justify)
+//                                Text(text = "Rating: ${review.rating}★", color = Color.Gray)
+//                            }
+//                        }
+//                    }
+//                } else {
+//                    Text(text = "No reviews yet!", color = Color.Gray)
+//                }
 
-                Spacer(modifier = Modifier.height(16.dp))
+//                Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(16.dp),

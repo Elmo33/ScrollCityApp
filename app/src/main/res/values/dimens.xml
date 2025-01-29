@@ -3,4 +3,6 @@
     <!-- res/values/dimens.xml -->
     <dimen name="navbar_size">56dp</dimen>
     <dimen name="right_padding">16dp</dimen>
+    <dimen name="icon_buttons">40dp</dimen>
+    <dimen name="top_padding">12dp</dimen>
 </resources>

@@ -108,13 +108,12 @@ fun FullScreenMediaItem(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .zIndex(1f)
-                .padding(15.dp, top = 20.dp)
-//                .padding( = R.dimen.right_padding.dp, vertical = 16.dp)
+                .padding(15.dp, top = context.resources.getDimension(R.dimen.top_padding).dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_tune),
                 contentDescription = "Open Filters",
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(context.resources.getDimension(R.dimen.icon_buttons).dp),
                 tint = Color.White,
             )
         }

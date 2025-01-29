@@ -40,7 +40,7 @@ fun BottomNavigationBar(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)  // Align to the bottom
-                .padding(5.dp),  // Fixed padding
+                .padding(bottom = 7.dp),  // Fixed padding
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -49,14 +49,12 @@ fun BottomNavigationBar(
                 label = "Events",
                 onClick = { navController.navigate("eventsScreen") }
             )
-            Box(
-            ) {
-                NavigationButton(
-                    iconResId = R.drawable.binoculars,
-                    label = "Discover",
-                    onClick = { navController.navigate("mainScreen") },
-                )
-            }
+
+            NavigationButton(
+                iconResId = R.drawable.binoculars,
+                label = "Discover",
+                onClick = { navController.navigate("mainScreen") },
+            )
             NavigationButton(
                 iconResId = R.drawable.ic_profile,
                 label = "Profile",
