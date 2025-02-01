@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.media3.common.Player
 import com.spotter.sampledata.Venue
 
 @Composable
@@ -41,24 +42,38 @@ fun HorizontalScroller(
     contentResIds: List<Int>,
     exoPlayer: ExoPlayer,
     context: Context,
-    controller: Boolean = true
+    controller: Boolean = true,
+    // Optional click callback (if provided, the item becomes clickable)
+    onItemClick: ((Int) -> Unit)? = null
 ) {
+    // Ensure the video repeats indefinitely
+    LaunchedEffect(key1 = exoPlayer) {
+        exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+    }
+
     HorizontalPager(
         state = state,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize() // or .fillMaxWidth() as needed
     ) { index ->
-        val fullScreenMediaResId = contentResIds[index]
+        val mediaResId = contentResIds[index]
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black)
+                .then(
+                    if (onItemClick != null) {
+                        Modifier.clickable { onItemClick(index) }
+                    } else Modifier
+                )
         ) {
-            if (isVideoResource(context, fullScreenMediaResId)) {
+            if (isVideoResource(context, mediaResId)) {
                 AndroidView(
                     modifier = Modifier.fillMaxSize(),
                     factory = { ctx ->
                         PlayerView(ctx).apply {
                             layoutParams = FrameLayout.LayoutParams(
-                                LayoutParams.MATCH_PARENT,
-                                LayoutParams.MATCH_PARENT
+                                FrameLayout.LayoutParams.MATCH_PARENT,
+                                FrameLayout.LayoutParams.MATCH_PARENT
                             )
                             setBackgroundColor(android.graphics.Color.BLACK)
                             player = exoPlayer
@@ -68,14 +83,16 @@ fun HorizontalScroller(
                 )
             } else {
                 androidx.compose.foundation.Image(
-                    painter = painterResource(id = fullScreenMediaResId),
-                    contentDescription = "Full screen image",
+                    painter = painterResource(id = mediaResId),
+                    contentDescription = "Image content",
                     modifier = Modifier.fillMaxSize()
                 )
             }
         }
     }
 }
+
+
 
 @Composable
 fun FullScreenMediaViewer(
@@ -193,6 +210,7 @@ fun HorizontalMediaScroll(
     isActive: Boolean,
     venue: Venue
 ) {
+    // Create a pager state
     val horizontalPagerState = rememberPagerState(
         initialPage = 0,
         pageCount = { contentResIds.size }
@@ -201,76 +219,46 @@ fun HorizontalMediaScroll(
     var isFullScreen by remember { mutableStateOf(false) }
     var selectedMediaIndex by remember { mutableStateOf(0) }
 
+    // Control video playback based on the current page and active state.
     LaunchedEffect(isActive, horizontalPagerState.currentPage) {
-        exoPlayer.playWhenReady = isActive && isVideoResource(
-            context,
-            contentResIds[horizontalPagerState.currentPage]
-        )
-        if (isActive && isVideoResource(
-                context,
-                contentResIds[horizontalPagerState.currentPage]
-            )
-        ) {
+        val currentResId = contentResIds[horizontalPagerState.currentPage]
+        val isVideo = isVideoResource(context, currentResId)
+        exoPlayer.playWhenReady = isActive && isVideo
+        if (isActive && isVideo) {
             exoPlayer.play()
         } else {
             exoPlayer.pause()
         }
     }
 
-    HorizontalPager(
+    // Use the modular HorizontalScroller instead of directly using HorizontalPager.
+    HorizontalScroller(
         state = horizontalPagerState,
-        modifier = Modifier.fillMaxWidth()
-    ) { mediaIndex ->
-        val mediaResId = contentResIds[mediaIndex]
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.Black)
-                .clickable {
-                    if (isDetailsPage) {
-                        selectedMediaIndex = mediaIndex
-                        isFullScreen = true
-                    }
-                }
-        ) {
-            if (isVideoResource(context, mediaResId)) {
-                AndroidView(
-                    modifier = Modifier.fillMaxWidth(),
-                    factory = { ctx ->
-                        PlayerView(ctx).apply {
-                            layoutParams = FrameLayout.LayoutParams(
-                                LayoutParams.MATCH_PARENT,
-                                LayoutParams.MATCH_PARENT
-                            )
-                            setBackgroundColor(android.graphics.Color.BLACK)
-                            player = exoPlayer
-                            useController = false
-                        }
-                    }
-                )
-            } else {
-                androidx.compose.foundation.Image(
-                    painter = painterResource(id = mediaResId),
-                    contentDescription = "Image content",
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-        }
-    }
-
-
-    PagerRow(
-        contentResIds,
-        modifier,
-        horizontalPagerState,
-        indicatorColor,
-        inactiveIndicatorColor,
-        spacing,
-        indicatorWidth,
-        indicatorHeight
+        contentResIds = contentResIds,
+        exoPlayer = exoPlayer,
+        context = context,
+        // We disable the controller here to match your original usage.
+        controller = false,
+        // If this is a details page, make the media clickable to open the full-screen view.
+        onItemClick = if (isDetailsPage) { index ->
+            selectedMediaIndex = index
+            isFullScreen = true
+        } else null
     )
 
-    // Call the Full-Screen Media Viewer
+    // Render the pager indicators
+    PagerRow(
+        contentResIds = contentResIds,
+        modifier = modifier,
+        horizontalPagerState = horizontalPagerState,
+        indicatorColor = indicatorColor,
+        inactiveIndicatorColor = inactiveIndicatorColor,
+        spacing = spacing,
+        indicatorWidth = indicatorWidth,
+        indicatorHeight = indicatorHeight
+    )
+
+    // Show the full-screen media viewer if needed.
     if (isFullScreen) {
         FullScreenMediaViewer(
             contentResIds = contentResIds,
@@ -287,4 +275,5 @@ fun HorizontalMediaScroll(
         )
     }
 }
+
 

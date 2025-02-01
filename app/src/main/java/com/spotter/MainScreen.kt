@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +55,9 @@ fun MainScrollScreen(navController: NavController) {
         Box(modifier = Modifier.fillMaxSize()) {
             VerticalPager(
                 state = pagerState,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = dimensionResource(R.dimen.navbar_size))
             ) { page ->
                 val isCurrentPage = (pagerState.currentPage == page)
                 val currentPlayer = exoPlayers[page]
@@ -108,12 +111,13 @@ fun FullScreenMediaItem(
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .zIndex(1f)
-                .padding(15.dp, top = context.resources.getDimension(R.dimen.top_padding).dp)
+                .padding(top = dimensionResource(R.dimen.top_padding))
+                .padding(horizontal = 8.dp)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_tune),
                 contentDescription = "Open Filters",
-                modifier = Modifier.size(context.resources.getDimension(R.dimen.icon_buttons).dp),
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_buttons)),
                 tint = Color.White,
             )
         }
@@ -167,7 +171,6 @@ fun FullScreenMediaItem(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .padding(bottom = 60.dp)
                 ) {
                     Text(
                         text = venue.name,

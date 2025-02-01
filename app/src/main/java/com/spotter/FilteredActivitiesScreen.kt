@@ -6,6 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,7 +21,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.spotter.R
@@ -53,6 +58,7 @@ fun FilterActivitiesScreen(navController: NavController) {
 
     val timePeriods = listOf("Morning", "Afternoon", "Evening", "Night")
 
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -60,76 +66,79 @@ fun FilterActivitiesScreen(navController: NavController) {
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Scrollable content
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.top_padding))
+                    .padding(horizontal = 8.dp)
+                    .zIndex(1f)// Custom size for icon button
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.back_ic),
+                    contentDescription = "",
+                    tint = Color.White,
+                    modifier = Modifier.size(context.resources.getDimension(R.dimen.icon_buttons).dp) // Actual icon size
+                )
+            }
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
-                    .padding(bottom = 90.dp)
+                    .padding(top=40.dp)
+                    .padding(horizontal = 32.dp)
+                    .padding(bottom = dimensionResource(R.dimen.navbar_size))
                     .verticalScroll(rememberScrollState())
             ) {
+
                 Text(
                     text = "Select Your Desired Venues",
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // People Slider
+// People Slider
                 RangeSliderWithIcons(
                     valueRange = 1f..5f,
-                    currentRange = peopleRange,
                     onRangeChange = { peopleRange = it },
                     steps = 3,
-                    isEnabled = isPeopleEnabled,
-                    onToggle = { isPeopleEnabled = !isPeopleEnabled },
                     labelPrefix = "Number of People:",
                     valueFormatter = { value -> value.toInt().toString() },
                     iconResource = R.drawable.single // Custom person icon for thumbs
                 )
 
-
-                // Cost Slider
-                val costLabels = listOf("Free", "$", "$$", "$$$")
+// Cost Slider
+                val costLabels = listOf("Free", "$", "$$", "$$$+")
                 RangeSliderWithIcons(
                     valueRange = 0f..3f,
-                    currentRange = costRange,
                     onRangeChange = { costRange = it },
                     steps = 2,
-                    isEnabled = isCostEnabled,
-                    onToggle = { isCostEnabled = !isCostEnabled },
                     labelPrefix = "Cost:",
                     valueFormatter = { value -> costLabels[value.toInt()] },
                     iconResource = R.drawable.dollar
                 )
 
-
-                // Time Slider
+// Time Slider
                 RangeSliderWithIcons(
                     valueRange = 0f..3f,
-                    currentRange = timeRange,
                     onRangeChange = { timeRange = it },
                     steps = timePeriods.size - 2,
-                    isEnabled = isTimeEnabled,
-                    onToggle = { isTimeEnabled = !isTimeEnabled },
                     labelPrefix = "Preferred Time:",
                     valueFormatter = { value -> timePeriods[value.toInt()] }
                 )
 
 
-                // Distance Slider
+
+// Distance Slider (single-thumb version)
                 RangeSliderWithIcons(
                     valueRange = 1f..50f,
-                    currentRange = distanceRange,
                     onRangeChange = { distanceRange = it },
                     steps = 48,
-                    isEnabled = isDistanceEnabled,
-                    onToggle = { isDistanceEnabled = !isDistanceEnabled },
                     labelPrefix = "Distance:",
-                    valueFormatter = { value -> if (value >= 50f) "50+ km" else "${value.toInt()} km" }
+                    valueFormatter = { value -> if (value >= 50f) "50+ km" else "${value.toInt()} km" },
+                    singleThumb = true
                 )
+
 
 
 
@@ -137,8 +146,7 @@ fun FilterActivitiesScreen(navController: NavController) {
 
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                        .fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -146,7 +154,6 @@ fun FilterActivitiesScreen(navController: NavController) {
                         text = "Include/Exclude Venues",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color.Black
                     )
                     Switch(checked = false, onCheckedChange = { /* TODO */ })
                 }
@@ -187,20 +194,22 @@ fun FilterActivitiesScreen(navController: NavController) {
 @Composable
 fun RangeSliderWithIcons(
     valueRange: ClosedFloatingPointRange<Float>,
-    currentRange: ClosedFloatingPointRange<Float>,
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
     steps: Int,
-    isEnabled: Boolean,
-    onToggle: () -> Unit,
     labelPrefix: String,
     valueFormatter: (Float) -> String,
-    iconResource: Int? = null
+    iconResource: Int? = null,
+    singleThumb: Boolean = false
 ) {
     val density = LocalDensity.current
-    var internalEnabled by remember { mutableStateOf(isEnabled) }
-    var sliderRange by remember { mutableStateOf(currentRange) }
+    // For the two-thumb slider, default to the full range.
+    // For the single-thumb slider, we only adjust the maximum.
+    var sliderRange by remember { mutableStateOf(valueRange) }
+    var sliderValue by remember { mutableStateOf(valueRange.endInclusive) }
     var sliderWidth by remember { mutableStateOf(0f) }
     var thumbRadiusPx by remember { mutableStateOf(0f) }
+    // (This variable is here if you want to adjust the icon’s offset based on its size.)
+    var iconSizePx by remember { mutableStateOf(0f) }
 
     LaunchedEffect(Unit) {
         thumbRadiusPx = with(density) { 10.dp.toPx() }
@@ -209,97 +218,157 @@ fun RangeSliderWithIcons(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(12.dp)
-            .clickable { internalEnabled = !internalEnabled; onToggle() }
+            .padding(vertical = 12.dp)
     ) {
-        Text(
-            text = if (sliderRange.start == sliderRange.endInclusive) {
+        // Use a different label depending on slider type.
+        val labelText = if (singleThumb) {
+            "$labelPrefix ${valueFormatter(sliderValue)}"
+        } else {
+            if (sliderRange.start == sliderRange.endInclusive) {
                 "$labelPrefix ${valueFormatter(sliderRange.start)}"
             } else {
                 "$labelPrefix ${valueFormatter(sliderRange.start)} - ${valueFormatter(sliderRange.endInclusive)}"
-            },
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium
+            }
+        }
+        Text(
+            text = labelText,
+            style = MaterialTheme.typography.bodyMedium
         )
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
+            // These will hold the X position(s) for the thumb(s)
             var startThumbX by remember { mutableStateOf(0f) }
             var endThumbX by remember { mutableStateOf(0f) }
-            var iconSizePx by remember { mutableStateOf(0f) }
 
-            // Animatable offset for "dangling" effect
-            val startIconYOffset = remember { Animatable(0f) }
-            val endIconYOffset = remember { Animatable(0f) }
-
-            LaunchedEffect(sliderRange.start) {
-                startIconYOffset.animateTo(
-                    targetValue = (-10..10).random().toFloat(),
-                    animationSpec = spring(
-                        dampingRatio = 0.5f,
-                        stiffness = 200f
+            if (singleThumb) {
+                // A single-thumb slider: we animate one icon offset for a fun “dangling” effect.
+                val iconYOffset = remember { Animatable(0f) }
+                LaunchedEffect(sliderValue) {
+                    iconYOffset.animateTo(
+                        targetValue = (-10..10).random().toFloat(),
+                        animationSpec = spring(dampingRatio = 0.5f, stiffness = 200f)
                     )
-                )
-            }
-            LaunchedEffect(sliderRange.endInclusive) {
-                endIconYOffset.animateTo(
-                    targetValue = (-10..10).random().toFloat(),
-                    animationSpec = spring(
-                        dampingRatio = 0.5f,
-                        stiffness = 200f
-                    )
-                )
-            }
+                }
 
-            RangeSlider(
-                value = sliderRange,
-                onValueChange = {
-                    if (internalEnabled) {
+                Slider(
+                    value = sliderValue,
+                    onValueChange = { newValue ->
+                        sliderValue = newValue
+                        // Construct a range from the minimum (fixed) to the new maximum.
+                        onRangeChange(valueRange.start..newValue)
+                    },
+                    valueRange = valueRange,
+                    steps = steps,
+                    colors = SliderDefaults.colors(
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .onGloballyPositioned { coordinates ->
+                            sliderWidth = coordinates.size.width.toFloat()
+                            val trackWidth = sliderWidth - 2 * thumbRadiusPx
+                            // Calculate the thumb’s X position.
+                            startThumbX = thumbRadiusPx +
+                                    ((sliderValue - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
+                        }
+                )
+//
+//                if (iconResource != null) {
+//                    Icon(
+//                        imageVector = ImageVector.vectorResource(id = iconResource),
+//                        contentDescription = null,
+//                        modifier = Modifier
+//                            .size(32.dp)
+//                            .offset {
+//                                IntOffset(
+//                                    // Use the calculated thumb position; adjust the X/Y offsets as needed.
+//                                    (startThumbX - iconSizePx / 2).toInt() - 55,
+//                                    (iconYOffset.value).toInt() + 35
+//                                )
+//                            },
+//                        tint = MaterialTheme.colorScheme.primary
+//                    )
+//                }
+            } else {
+                // Two-thumb slider.
+                val startIconYOffset = remember { Animatable(0f) }
+                val endIconYOffset = remember { Animatable(0f) }
+                LaunchedEffect(sliderRange.start) {
+                    startIconYOffset.animateTo(
+                        targetValue = (-10..10).random().toFloat(),
+                        animationSpec = spring(dampingRatio = 0.5f, stiffness = 200f)
+                    )
+                }
+                LaunchedEffect(sliderRange.endInclusive) {
+                    endIconYOffset.animateTo(
+                        targetValue = (-10..10).random().toFloat(),
+                        animationSpec = spring(dampingRatio = 0.5f, stiffness = 200f)
+                    )
+                }
+
+                val interactionSource = remember { MutableInteractionSource() }
+
+                RangeSlider(
+                    value = sliderRange,
+                    onValueChange = {
                         sliderRange = it
                         onRangeChange(it)
-                    }
-                },
-                valueRange = valueRange,
-                steps = steps,
-                enabled = internalEnabled,
-                colors = SliderDefaults.colors(
-                    thumbColor = Color.Transparent,
-                    activeTrackColor = if (internalEnabled) MaterialTheme.colorScheme.primary else Color.Gray,
-                    inactiveTrackColor = Color.LightGray,
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onGloballyPositioned { coordinates ->
-                        sliderWidth = coordinates.size.width.toFloat()
-                        val trackWidth = sliderWidth - 2 * thumbRadiusPx
-                        startThumbX = thumbRadiusPx + ((sliderRange.start - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
-                        endThumbX = thumbRadiusPx + ((sliderRange.endInclusive - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
-                    }
-            )
+                    },
+                    valueRange = valueRange,
+                    steps = steps,
+                    colors = SliderDefaults.colors(
+                        thumbColor = Color.Transparent,
+                        activeTrackColor = MaterialTheme.colorScheme.primary,
+                        inactiveTrackColor = Color.LightGray,
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .indication(interactionSource, null)
+                        .onGloballyPositioned { coordinates ->
+                            sliderWidth = coordinates.size.width.toFloat()
+                            val trackWidth = sliderWidth - 2 * thumbRadiusPx
+                            startThumbX = thumbRadiusPx +
+                                    ((sliderRange.start - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
+                            endThumbX = thumbRadiusPx +
+                                    ((sliderRange.endInclusive - valueRange.start) / (valueRange.endInclusive - valueRange.start)) * trackWidth
+                        }
+                )
 
-            if (iconResource != null) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = iconResource),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .offset { IntOffset((startThumbX - iconSizePx / 2).toInt()- 55, (startIconYOffset.value).toInt() + 35) },
-                    tint = if (internalEnabled) MaterialTheme.colorScheme.primary else Color.Gray
-                )
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = iconResource),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(32.dp)
-                        .offset { IntOffset((endThumbX - iconSizePx / 2).toInt() - 55, (endIconYOffset.value).toInt() + 35)},
-                    tint = if (internalEnabled) MaterialTheme.colorScheme.primary else Color.Gray
-                )
+                if (iconResource != null) {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconResource),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .offset {
+                                IntOffset(
+                                    (startThumbX - iconSizePx / 2).toInt() - 55,
+                                    (startIconYOffset.value).toInt() + 35
+                                )
+                            },
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = iconResource),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(32.dp)
+                            .offset {
+                                IntOffset(
+                                    (endThumbX - iconSizePx / 2).toInt() - 55,
+                                    (endIconYOffset.value).toInt() + 35
+                                )
+                            },
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }
 }
+
 
 
 

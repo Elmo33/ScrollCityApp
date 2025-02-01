@@ -56,14 +56,12 @@ fun UserProfileScreen(navController: NavController) {
                         text = "Profile",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = { navController.navigate("settingsScreen") }) {
                             Icon(
                                 imageVector = Icons.Default.Settings,
                                 contentDescription = "Settings Button",
-                                tint = Color.Black,
                                 modifier = Modifier.size(32.dp)
                             )
                         }
