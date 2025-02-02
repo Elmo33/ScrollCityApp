@@ -11,6 +11,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.spotter.ui.BottomNavigationBar
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,13 +37,16 @@ fun UserProfileScreen(navController: NavController) {
             .background(MaterialTheme.colorScheme.background),
         color = MaterialTheme.colorScheme.background
     ) {
+        var selectedTabIndex by remember { mutableStateOf(0) }
+        val tabTitles = listOf("Posts", "Liked", "Saved Venues", "Events")
+
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
+                    .padding(top = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -81,8 +88,30 @@ fun UserProfileScreen(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Main Content: Upcoming Events and Liked Venues
-                MainProfileContent(navController)
+                // Tab Row
+                ScrollableTabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    edgePadding = 0.dp,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    tabTitles.forEachIndexed { index, title ->
+                        Tab(
+                            selected = selectedTabIndex == index,
+                            onClick = { selectedTabIndex = index },
+                            text = { Text(text = title, fontSize = 16.sp) }
+                        )
+                    }
+                }
+
+                // Content Below Tabs
+                Spacer(modifier = Modifier.height(16.dp))
+                when (selectedTabIndex) {
+                    0 -> TabContentPosts(navController)
+                    1 -> TabContentLiked(navController)
+                    2 -> TabContentSavedVenues(navController)
+                    3 -> TabContentEvents(navController)
+                }
 
                 Spacer(modifier = Modifier.weight(1f))
             }
@@ -99,86 +128,49 @@ fun UserProfileScreen(navController: NavController) {
 }
 
 @Composable
-fun MainProfileContent(navController: NavController) {
+fun TabContentPosts(navController: NavController) {
+    // Replace this with your actual posts content
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Upcoming Events",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        // Placeholder for Upcoming Events
-        repeat(3) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(8.dp))
-                    .height(120.dp)
-                    .clickable { navController.navigate("eventDetailsScreen") }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Event ${it + 1}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        text = "Event Details: Fun activities at this venue!",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Liked Venues",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        // Placeholder for Liked Venues
-        repeat(3) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .background(Color.LightGray, RoundedCornerShape(8.dp))
-                    .height(120.dp)
-                    .clickable { navController.navigate("venueDetailsScreen") }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Venue ${it + 1}",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
-                    )
-                    Text(
-                        text = "Discover this popular spot in your area!",
-                        fontSize = 14.sp,
-                        color = Color.Gray
-                    )
-                }
-            }
-        }
+        Text("Your Posts will be displayed here.")
     }
 }
+
+@Composable
+fun TabContentLiked(navController: NavController) {
+    // Replace this with your actual liked content
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Your Liked items will be displayed here.")
+    }
+}
+
+@Composable
+fun TabContentSavedVenues(navController: NavController) {
+    // Replace this with your actual saved venues content
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Your Saved Venues will be displayed here.")
+    }
+}
+
+@Composable
+fun TabContentEvents(navController: NavController) {
+    // Replace this with your actual events content
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Your Upcoming Events will be displayed here.")
+    }
+}
+
 @Composable
 fun UserProfileHeader() {
     Column(
