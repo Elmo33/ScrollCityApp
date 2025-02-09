@@ -10,4 +10,10 @@
     <color name="blueTheme">#0C1431</color>
     <color name="orange">#FD6642</color>
     <color name="background">#12171C</color>
+    <color name="primary">#FF9800</color>
+    <color name="on_primary">#FFFFFF</color>
+    <color name="secondary">#03DAC5</color>
+    <color name="surface">#121212</color>
+    <color name="on_surface">#FFFFFF</color>
+    <color name="on_background">#FFFFFF</color>
 </resources>
